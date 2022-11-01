@@ -9,13 +9,13 @@ const userStories =
 	{
 		id: '1111',
 		title: 'Implement authentication',
-		phase: 'toDo',
+		stage: 'toDo',
 		imageUrl: 'https://blog.geekitude.com/wp-content/uploads/2022/09/TicketStage_01_ToDo.jpg'
 	},
 	{
 		id: '2222',
 		title: 'Write unit tests',
-		phase: 'toDo',
+		stage: 'toDo',
 		imageUrl: 'https://blog.geekitude.com/wp-content/uploads/2022/09/TicketStage_01_ToDo.jpg'
 	}
 ];
@@ -30,7 +30,8 @@ app.get('/api/userstories', (req, res) => {
 	catch(err) {
 		var errMessage = `${err}`;
 		processErrorResponse(res, 500, errMessage);
-	}			
+	}
+	// processErrorResponse(res, 500, "A friendly error");
 })
 	
 function processErrorResponse(res, statusCode, message) {

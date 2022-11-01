@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { store } from './app/store';
 import App from './App';
-import mockFetch from './mocks/mockFetch';
+import { userStoriesResponse } from './mocks/mockFetch';
 import { changeStage, getUserStories, selectUserStories, stageOptions, UserStory, UserStoryStage } from './features/userstories/userStoriesSlice'
 
 test('renders learn react link', () => {
@@ -17,14 +17,24 @@ test('renders learn react link', () => {
   expect(getByText(/Loading/i)).toBeInTheDocument();
 });
 
-/*
-describe('67087596', () => {
+
+describe('calling the API', () => {
   it('should pass', async () => {
-    const nameAndEmail = {
-      name: 'John Smith',
-      email: '123@123.com',
-    };
-    const getSpy = jest.spyOn(window, 'fetch').mockImplementation(mockFetch);
+	const getSpy = jest.spyOn(window, 'fetch')
+		.mockImplementation(jest.fn(() => Promise.resolve(
+		{ 
+			headers: new Headers(),
+			json: () => { 
+				console.log("getSpy: We are about to resolve a promise in response.json()");
+				return Promise.resolve(userStoriesResponse)
+			}, 
+			status: 200,
+			text: () => { 
+				console.log("getSpy: We are about to resolve a promise in response.text()");
+				return Promise.resolve("A text response")
+			}			
+		})
+	, ) as jest.Mock);
     const store = configureStore({
       reducer: {
 		  userstories: function (state = '', action) {
@@ -43,9 +53,9 @@ describe('67087596', () => {
       },
     });
     await store.dispatch(getUserStories());
-    expect(getSpy).toBeCalledWith('api/userstories');
+    expect(getSpy).toBeCalledWith('https://api.geekitude.com/api/userStories');
+	// expect(getSpy).toBeCalledWith('api/userstories');
     const state = store.getState();
-    expect(state).toEqual('1');
+    expect(state).toEqual({userstories: userStoriesResponse});
   });
 });
-*/

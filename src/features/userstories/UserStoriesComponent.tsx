@@ -7,15 +7,15 @@ import styles from './UserStories.module.css';
 
 export default function UserStoriesComponent() {
   const dispatch = useAppDispatch();
-  // const { entities, loading } = useSelector((state: UserStoriesState) => state.userstories)
-  const { entities, loading } = useSelector(selectUserStories)
+  const { entities, loading, error } = useSelector(selectUserStories)
+  console.log(`UserStoriesComponent: entities = ${JSON.stringify(entities)}`);
 
   useEffect(() => {
 	console.log(`UserStoriesComponent: useEffect`);
     dispatch(getUserStories())
   }, [dispatch])
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <p>Loading...</p> 
   
   const handleChange = (userStory: UserStory, event: any) => {
 	const found = stageOptions.find((elem) => {
@@ -30,11 +30,16 @@ export default function UserStoriesComponent() {
   }
   
   return (
-    <div>
-      <h2>User stories</h2>
-	  {entities.map((userStory: UserStory, ind: number) => (
-	  <UserStoryComponent key={userStory.id} num={ind}/>
-      ))}
+    <div>	
+      <h2>User stories</h2>	  
+		<div style={{ display: error ? "block" : "none", color: 'red' }}>{ error }</div>
+	  {
+		  entities ?
+			entities.map((userStory: UserStory, ind: number) => (
+				<UserStoryComponent key={userStory.id} num={ind}/>
+			))
+			: <h3>No data found</h3>
+	  }
     </div>
   )
 }

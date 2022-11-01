@@ -47,24 +47,71 @@ export interface UserStoryStage {
 
 export interface UserStoriesState {
   entities: UserStory[],
-  loading: boolean 
+  loading: boolean,
+  error: string | undefined
 }
 
 const initialState: UserStoriesState = {
   entities: [],
   loading: false,
+  error: undefined
 }
 
-
+/*
 export const getUserStories = createAsyncThunk(
   'userstories/getUserStories',
   async (thunkAPI) => {
-    // const res = await fetch('api/userstories').then(
-	const res = await fetch('https://api.geekitude.com/api/userStories').then(
+    const res = await fetch('api/userstories').then(
+	// const res = await fetch('https://api.geekitude.com/api/userStories').then(
     (data) => data.json()
   )
   return res
 })
+*/
+
+
+export const getUserStories = createAsyncThunk(
+  'userstories/getUserStories',
+  async (_, { rejectWithValue }) => {
+	try { 
+		// const response = await fetch('api/userstories'); 
+		const response = await fetch('https://api.geekitude.com/api/userStories'); 
+		if (response.status === 200) {
+			console.log(`'userstories/getUserStories': promise fulfilled, response.status === 200`);
+			const userStoriesInfo = await response.json();	
+			if (response.headers) {
+				console.log(`response.headers = `);
+				console.log(...response.headers);			
+			}			
+			return userStoriesInfo;
+		}
+		else {
+			let errMessage;
+			console.log(`'userstories/getUserStories': promise fulfilled, response.status is NOT 200, but ${response.status} response.headers = `);
+			if (response.headers) {
+				console.log(`response.headers = `);
+				console.log(...response.headers);			
+			}
+			const contentTypeHeader = response.headers.get('Content-Type');
+			console.log(`'userstories/getUserStories': contentTypeHeader = ${contentTypeHeader}`);
+			if (contentTypeHeader?.startsWith("application/json")) {
+				// errMessage = await response.json();
+				const err = await response.json();
+				errMessage = err.error.message;
+			}
+			else {
+				errMessage = await response.text();
+			}			
+			console.log(`'userstories/getUserStories': errMessage = ${JSON.stringify(errMessage)}`);
+			return rejectWithValue("Unable to retrieve data")
+		}
+	  }
+	  catch (err) {
+		console.log(`'userstories/getUserStories': we are in catch; err = ${err}; calling rejectWithValue(err)`);
+		return rejectWithValue(err)
+	  }
+  }  
+)
 
 
 export const userStoriesSlice = createSlice({
@@ -95,9 +142,13 @@ export const userStoriesSlice = createSlice({
       .addCase(getUserStories.fulfilled, (state, action) => {
 		state.loading = false
         state.entities = action.payload;
+		state.error = undefined;
       })
-      .addCase(getUserStories.rejected, (state) => {
-		state.loading = false
+      .addCase(getUserStories.rejected, (state, action) => {
+		  console.log(`We are in getUserStories.rejected: action = ${action} action.payload = ${action.payload} action.error = ${JSON.stringify(action.error)}`);
+		state.loading = false;
+		// state.error = action.error.message;
+		state.error = action.payload as string;
       });
   },  
 })
