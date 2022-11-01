@@ -32,6 +32,8 @@ export default function UserStoriesComponent() {
   return (
     <div>	
       <h2>User stories</h2>	  
+		  <div style={{ marginBottom: '30px' }}>This application was created for Women Who Code Austin, TX frontend meetup to demonstrate React.js with Redux-Toolkit. Here is the Github repository: <a href="https://github.com/elze/redux-toolkit-blogposts">https://github.com/elze/redux-toolkit-blogposts</a>. <br/>	
+		  Here is the <a href="http://geekitude.com">author's website</a>.</div>  
 		<div style={{ display: error ? "block" : "none", color: 'red' }}>{ error }</div>
 	  {
 		  entities ?
